@@ -1,0 +1,57 @@
+{
+  "name": "@tsexpress-starter/routes",
+  "version": "0.1.4",
+  "description": "Route decorators for TSExpress Starter.",
+  "keywords": [
+    "typescript",
+    "express"
+  ],
+  "author": "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)",
+  "homepage": "https://github.com/dugajean/tsexpress-starter-core",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dugajean/tsexpress-starter-core/issues",
+    "email": "me@dukagj.in"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dugajean/tsexpress-starter-core.git"
+  },
+  "contributors": [
+    "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)"
+  ],
+  "main": "dist/verbs.js",
+  "types": "dist/verbs.d.ts",
+  "scripts": {
+    "prepublish": "yarn build",
+    "build": "rimraf dist && yarn lint && tsc",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "test": "cross-env NODE_ENV=test tsc && ava"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.1",
+    "ava": "^2.2.0",
+    "cross-env": "^5.2.0",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "ava": {
+    "failFast": true,
+    "verbose": true,
+    "helpers": [
+      "test/helpers/**/*"
+    ],
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "engines": {
+    "node": ">=8.3"
+  }
+}
