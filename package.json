@@ -7,15 +7,15 @@
     "express"
   ],
   "author": "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)",
-  "homepage": "https://github.com/dugajean/tsexpress-starter-core",
+  "homepage": "https://github.com/dugajean/tsexpress-starter-routes",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dugajean/tsexpress-starter-core/issues",
+    "url": "https://github.com/dugajean/tsexpress-starter-routes/issues",
     "email": "me@dukagj.in"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dugajean/tsexpress-starter-core.git"
+    "url": "git+https://github.com/dugajean/tsexpress-starter-routes.git"
   },
   "contributors": [
     "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)"
