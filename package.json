@@ -7,15 +7,15 @@
     "express"
   ],
   "author": "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)",
-  "homepage": "https://github.com/dugajean/tsexpress-starter-routes",
+  "homepage": "https://github.com/dugajean/tsexpress-starter-errors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dugajean/tsexpress-starter-routes/issues",
+    "url": "https://github.com/dugajean/tsexpress-starter-errorsissues",
     "email": "me@dukagj.in"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dugajean/tsexpress-starter-routes.git"
+    "url": "git+https://github.com/dugajean/tsexpress-starter-errorsgit"
   },
   "contributors": [
     "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)"
@@ -24,9 +24,13 @@
   "types": "dist/verbs.d.ts",
   "scripts": {
     "prepublish": "yarn build",
+    "dev": "tsc -w",
     "build": "rimraf dist && yarn lint && tsc",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "test": "cross-env NODE_ENV=test tsc && ava"
+  },
+  "dependencies": {
+    "@tsexpress-starter/errors": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^12.7.1",

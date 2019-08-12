@@ -1,3 +1,5 @@
+import { HttpError } from '@tsexpress-starter/errors';
+
 export interface Route {
   path: string;
   handler: Function;
@@ -12,9 +14,32 @@ function addRoute(
   descriptor: PropertyDescriptor
 ) {
   const currentRoutes: Route[] = target._routes ? target._routes[verb] : [];
+  const currentHandler: Function = descriptor.value;
+
+  const adaptedHandler: Function = async (req: any, res: any, next: any) => {
+    let actionReturn;
+    try {
+      actionReturn = await currentHandler(req);
+    } catch (error) {
+      if (error instanceof HttpError) {
+        return error.errorMessage
+          ? res
+              .status(error.statusCode)
+              .json({ error: error.errorMessage.map((error: any) => error.constraints) })
+          : res.sendStatus(error.statusCode);
+      }
+
+      console.error(error);
+
+      return res.sendStatus(500);
+    }
+
+    res.send(actionReturn);
+  };
+
   const newRoute: Route = {
     path: route,
-    handler: descriptor.value,
+    handler: adaptedHandler,
     middlewares
   };
 
