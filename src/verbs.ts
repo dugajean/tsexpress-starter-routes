@@ -13,28 +13,23 @@ function addRoute(
   target: any,
   descriptor: PropertyDescriptor
 ) {
-  const currentRoutes: Route[] = target._routes ? target._routes[verb] : [];
+  const currentRoutes: Route[] = target._routes && target._routes[verb] ? target._routes[verb] : [];
   const currentHandler: Function = descriptor.value;
 
-  const adaptedHandler: Function = async (req: any, res: any, next: any) => {
-    let actionReturn;
-    try {
-      actionReturn = await currentHandler(req);
-    } catch (error) {
-      if (error instanceof HttpError) {
-        return error.errorMessage
-          ? res
-              .status(error.statusCode)
-              .json({ error: error.errorMessage.map((error: any) => error.constraints) })
-          : res.sendStatus(error.statusCode);
-      }
+  const adaptedHandler: Function = (req: any, res: any, next: any) => {
+    currentHandler
+      .call(target, req)
+      .then((data: any) => res.json({ data }))
+      .catch((error: any) => {
+        if (error instanceof HttpError) {
+          return error.errorMessage
+            ? res.status(error.statusCode).json({ error: error.errorMessage.map((e: any) => e.constraints) })
+            : res.sendStatus(error.statusCode);
+        }
 
-      console.error(error);
-
-      return res.sendStatus(500);
-    }
-
-    res.json({ data: actionReturn });
+        console.error(error);
+        return res.sendStatus(500);
+      });
   };
 
   const newRoute: Route = {
@@ -43,10 +38,16 @@ function addRoute(
     middlewares
   };
 
-  Object.defineProperty(target, '_routes', {
-    value: { [verb]: [...currentRoutes, newRoute] },
-    writable: true
-  });
+  const routeBlock = { [verb]: [...currentRoutes, newRoute] };
+
+  if (!target.hasOwnProperty('_routes')) {
+    Object.defineProperty(target, '_routes', {
+      value: routeBlock,
+      writable: true
+    });
+  } else {
+    target._routes = { ...target._routes, ...routeBlock };
+  }
 
   return descriptor;
 }
