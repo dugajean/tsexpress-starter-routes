@@ -34,7 +34,7 @@ function addRoute(
       return res.sendStatus(500);
     }
 
-    res.send(actionReturn);
+    res.json({ data: actionReturn });
   };
 
   const newRoute: Route = {
