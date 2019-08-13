@@ -1,4 +1,6 @@
+import path from 'path';
 import { HttpError } from '@tsexpress-starter/errors';
+import { log, stripSlashes } from '@tsexpress-starter/utils';
 
 export interface Route {
   path: string;
@@ -10,74 +12,62 @@ function addRoute(
   verb: string,
   route: string,
   middlewares: Function[],
-  target: any,
   descriptor: PropertyDescriptor
-) {
-  const currentRoutes: Route[] = target._routes && target._routes[verb] ? target._routes[verb] : [];
+): PropertyDescriptor {
   const currentHandler: Function = descriptor.value;
+  const adaptedHandler: Function = async (req: any, res: any, next: any) => {
+    try {
+      const controller = (await import(module.parent.filename)).default;
+      const data = await currentHandler.call(new controller(), req);
+      res.json({ data });
+    } catch (error) {
+      if (error instanceof HttpError) {
+        return error.errorMessage
+          ? res.status(error.statusCode).json({ error: error.errorMessage.map((e: any) => e.constraints) })
+          : res.sendStatus(error.statusCode);
+      }
 
-  const adaptedHandler: Function = (req: any, res: any, next: any) => {
-    currentHandler
-      .call(target, req)
-      .then((data: any) => res.json({ data }))
-      .catch((error: any) => {
-        if (error instanceof HttpError) {
-          return error.errorMessage
-            ? res.status(error.statusCode).json({ error: error.errorMessage.map((e: any) => e.constraints) })
-            : res.sendStatus(error.statusCode);
-        }
-
-        console.error(error);
-        return res.sendStatus(500);
-      });
+      console.error(error);
+      return res.sendStatus(500);
+    }
   };
 
-  const newRoute: Route = {
-    path: route,
-    handler: adaptedHandler,
-    middlewares
-  };
+  const baseRoute: string = path.basename(path.dirname(module.parent.filename));
+  const routePart: string = stripSlashes(route);
+  const fullRoute: string = `/${baseRoute}${routePart ? '/' : ''}${routePart}`;
 
-  const routeBlock = { [verb]: [...currentRoutes, newRoute] };
-
-  if (!target.hasOwnProperty('_routes')) {
-    Object.defineProperty(target, '_routes', {
-      value: routeBlock,
-      writable: true
-    });
-  } else {
-    target._routes = { ...target._routes, ...routeBlock };
-  }
+  log(`Detected route: [${verb.toUpperCase()}] ${fullRoute}`);
+  globalThis.expressApp[verb](fullRoute, ...[...(middlewares ? middlewares : []), adaptedHandler]);
 
   return descriptor;
 }
 
 export function Get(route: string = '', ...middlwares: Function[]) {
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    return addRoute('get', route, middlwares, target, descriptor);
+    return addRoute('get', route, middlwares, descriptor);
   };
 }
 
 export function Post(route: string = '', ...middlwares: Function[]) {
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    return addRoute('post', route, middlwares, target, descriptor);
+    return addRoute('post', route, middlwares, descriptor);
   };
 }
 
 export function Patch(route: string = '', ...middlwares: Function[]) {
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    return addRoute('patch', route, middlwares, target, descriptor);
+    return addRoute('patch', route, middlwares, descriptor);
   };
 }
 
 export function Put(route: string = '', ...middlwares: Function[]) {
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    return addRoute('put', route, middlwares, target, descriptor);
+    return addRoute('put', route, middlwares, descriptor);
   };
 }
 
 export function Delete(route: string = '', ...middlwares: Function[]) {
   return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-    return addRoute('delete', route, middlwares, target, descriptor);
+    return addRoute('delete', route, middlwares, descriptor);
   };
 }

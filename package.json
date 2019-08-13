@@ -30,7 +30,8 @@
     "test": "cross-env NODE_ENV=test tsc && ava"
   },
   "dependencies": {
-    "@tsexpress-starter/errors": "^0.1.0"
+    "@tsexpress-starter/errors": "^0.1.0",
+    "@tsexpress-starter/utils": "^0.1.8"
   },
   "devDependencies": {
     "@types/node": "^12.7.1",
