@@ -1,4 +1,6 @@
 import path from 'path';
+import 'reflect-metadata';
+import callsites from 'callsites';
 import { HttpError } from '@tsexpress-starter/errors';
 import { log, stripSlashes } from '@tsexpress-starter/utils';
 
@@ -14,10 +16,14 @@ function addRoute(
   middlewares: Function[],
   descriptor: PropertyDescriptor
 ): PropertyDescriptor {
+  const controllerPath: string = callsites()
+    .find(f => f.getFileName().includes('controller'))
+    .getFileName();
+
   const currentHandler: Function = descriptor.value;
   const adaptedHandler: Function = async (req: any, res: any, next: any) => {
     try {
-      const controller = (await import(module.parent.filename)).default;
+      const controller = (await import(controllerPath)).default;
       const data = await currentHandler.call(new controller(), req);
       const resultKey = typeof data !== 'boolean' ? 'data' : 'success';
       res.status(data.statusCode || 200).json({ [resultKey]: data });
@@ -33,7 +39,7 @@ function addRoute(
     }
   };
 
-  const baseRoute: string = path.basename(path.dirname(module.parent.filename));
+  const baseRoute: string = path.basename(path.dirname(controllerPath));
   const routePart: string = stripSlashes(route);
   const fullRoute: string = `/${baseRoute}${routePart ? '/' : ''}${routePart}`;
 
@@ -44,7 +50,7 @@ function addRoute(
 }
 
 export function Get(route: string = '', ...middlwares: Function[]) {
-  return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
+  return (target: any, key: string | symbol, descriptor: PropertyDescriptor) => {
     return addRoute('get', route, middlwares, descriptor);
   };
 }
