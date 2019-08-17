@@ -10,12 +10,12 @@
   "homepage": "https://github.com/dugajean/tsexpress-starter-errors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dugajean/tsexpress-starter-errorsissues",
+    "url": "https://github.com/dugajean/tsexpress-starter-errors/issues",
     "email": "me@dukagj.in"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dugajean/tsexpress-starter-errorsgit"
+    "url": "git+https://github.com/dugajean/tsexpress-starter-errors/git"
   },
   "contributors": [
     "Dukagjin Surdulli <me@dukagj.in> (https://dukagj.in/)"

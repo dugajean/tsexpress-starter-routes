@@ -19,7 +19,8 @@ function addRoute(
     try {
       const controller = (await import(module.parent.filename)).default;
       const data = await currentHandler.call(new controller(), req);
-      res.json({ data });
+      const resultKey = typeof data !== 'boolean' ? 'data' : 'success';
+      res.status(data.statusCode || 200).json({ [resultKey]: data });
     } catch (error) {
       if (error instanceof HttpError) {
         return error.errorMessage
@@ -37,7 +38,7 @@ function addRoute(
   const fullRoute: string = `/${baseRoute}${routePart ? '/' : ''}${routePart}`;
 
   log(`Detected route: [${verb.toUpperCase()}] ${fullRoute}`);
-  globalThis.expressApp[verb](fullRoute, ...[...(middlewares ? middlewares : []), adaptedHandler]);
+  globalThis.expressApp[verb](fullRoute, ...[...(middlewares || []), adaptedHandler]);
 
   return descriptor;
 }
